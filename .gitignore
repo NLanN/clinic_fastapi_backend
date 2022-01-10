@@ -1,5 +1,6 @@
 # Byte-compiled / optimized / DLL files
-__pycache__/
+**/__pycache__
+__pycache__
 *.py[cod]
 *$py.class
 
@@ -42,10 +43,10 @@ htmlcov/
 .tox/
 .nox/
 .coverage
-.coverage.*
+# .coverage.*
 .cache
 nosetests.xml
-coverage.xml
+# coverage.xml
 *.cover
 *.py,cover
 .hypothesis/
@@ -127,3 +128,14 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+.idea/
+static/
+src/static/
+
+/data
+
+.vscode/*
+pytest.ini
+
+.history

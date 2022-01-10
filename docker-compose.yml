@@ -1,0 +1,44 @@
+version: '3.1'
+services:
+  rabbit:
+    hostname: rabbit
+    restart: unless-stopped
+    container_name: rabbit
+    image: rabbitmq:latest
+    volumes:
+      - ./data/rabbit:/data
+    ports:
+      - "5672:5672"
+    networks:
+      - api_network
+
+  api:
+    build: .
+    container_name: api
+    restart: unless-stopped
+    env_file:
+      - '.env'
+    ports:
+      - "${PUBLIC_PORT}:${PORT}"
+    depends_on:
+      - api
+    volumes:
+      - ./data/static:/static
+    networks:
+      - api_network
+
+  tasks:
+    build: .
+    container_name: tasks
+    restart: unless-stopped
+    command: celery -A main.celery worker -l INFO
+    env_file:
+      - '.env'
+    depends_on:
+      - api
+    networks:
+      - api_network
+
+networks:
+  api_network:
+    driver: bridge
