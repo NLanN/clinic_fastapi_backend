@@ -3,8 +3,9 @@ from typing import Any, Dict, List, Optional, Union
 
 import dotenv
 from pydantic import AnyHttpUrl, AnyUrl, BaseSettings, validator
-
 # Load Enviroment Variables
+from pydantic.networks import PostgresDsn
+
 dotenv.load_dotenv()
 
 
@@ -25,7 +26,7 @@ class Settings(BaseSettings):
     def assemble_cors_origins(cls, v: Union[str, List[str]]) -> Union[List[str], str]:
         if isinstance(v, str):
             if v.startswith("["):
-                v = v[1 : len(v) - 1]
+                v = v[1: len(v) - 1]
             if v.endswith("]"):
                 v = v[: len(v) - 2]
             return [i.strip().replace('"', "").replace("'", "") for i in v.split(",")]
@@ -33,26 +34,28 @@ class Settings(BaseSettings):
             return v
         raise ValueError(v)
 
-    MYSQL_SERVER: str
-    MYSQL_USER: str
-    MYSQL_PASSWORD: str
-    MYSQL_DB: str
+    POSTGRES_SERVER: str
+    POSTGRES_USER: str
+    POSTGRES_PASSWORD: str
+    POSTGRES_DB: str
+    POSTGRES_PORT: str
     SQLALCHEMY_DATABASE_URI: Optional[AnyUrl] = None
 
     @validator("SQLALCHEMY_DATABASE_URI", pre=True)
     def assemble_db_connection(cls, v: Optional[str], values: Dict[str, Any]) -> Any:
         if isinstance(v, str):
             return v
-        return AnyUrl.build(
-            scheme="mysql+pymysql",
-            user=values.get("MYSQL_USER"),
-            password=values.get("MYSQL_PASSWORD"),
-            host=values.get("MYSQL_SERVER"),
-            path=f"/{values.get('MYSQL_DB') or ''}",
-            port=values.get("MYSQL_PORT"),
+        return PostgresDsn.build(
+            scheme="postgresql+psycopg2",
+            user=values.get("POSTGRES_USER"),
+            password=values.get("POSTGRES_PASSWORD"),
+            host=values.get("POSTGRES_SERVER"),
+            path=f"/{values.get('POSTGRES_DB') or ''}",
+            port=values.get("POSTGRES_PORT"),
         )
 
     CELERY_BROKER_URL: str
+    USERS_OPEN_REGISTRATION: bool
 
     class Config:
         case_sensitive = True

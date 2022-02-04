@@ -9,8 +9,9 @@ typer_app = typer.Typer()
 
 
 @typer_app.command()
-def run(reload: str = typer.Option("", help="Run development server.")):
-    uvicorn.run(app, host="localhost", port=8080, reload=reload)
+def run(reload: str = typer.Option("", help="Run development server."),
+        port: int = typer.Option(8000, help="Default 8000")):
+    uvicorn.run(app, host="localhost", port=port, reload=reload)
 
 
 typer_app.add_typer(user_cli, name="user")

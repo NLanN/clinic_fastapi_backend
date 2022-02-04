@@ -15,10 +15,10 @@ router = APIRouter()
 
 @router.get("/", response_model=List[ItemResponse])
 def read_items(
-    session: Session = Depends(get_session),
-    skip: int = 0,
-    limit: int = 100,
-    current_user: User = Depends(get_current_active_user),
+        session: Session = Depends(get_session),
+        skip: int = 0,
+        limit: int = 100,
+        current_user: User = Depends(get_current_active_user),
 ) -> Any:
     """
     Retrieve items.
@@ -32,10 +32,10 @@ def read_items(
 
 @router.post("/", response_model=ItemResponse)
 def create_item(
-    *,
-    session: Session = Depends(get_session),
-    item_in: ItemCreateRequest,
-    current_user: User = Depends(get_current_active_user),
+        *,
+        session: Session = Depends(get_session),
+        item_in: ItemCreateRequest,
+        current_user: User = Depends(get_current_active_user),
 ) -> Any:
     """
     Create new item.
@@ -46,11 +46,11 @@ def create_item(
 
 @router.put("/{id}", response_model=ItemResponse)
 def update_item(
-    *,
-    session: Session = Depends(get_session),
-    id: int,
-    item_in: ItemUpdateRequest,
-    current_user: User = Depends(get_current_active_user),
+        *,
+        session: Session = Depends(get_session),
+        id: int,
+        item_in: ItemUpdateRequest,
+        current_user: User = Depends(get_current_active_user),
 ) -> Any:
     """
     Update an item.
@@ -66,10 +66,10 @@ def update_item(
 
 @router.get("/{id}", response_model=ItemResponse)
 def read_item(
-    *,
-    session: Session = Depends(get_session),
-    id: int,
-    current_user: User = Depends(get_current_active_user),
+        *,
+        session: Session = Depends(get_session),
+        id: int,
+        current_user: User = Depends(get_current_active_user),
 ) -> Any:
     """
     Get item by ID.
@@ -84,10 +84,10 @@ def read_item(
 
 @router.delete("/{id}", response_model=ItemResponse)
 def delete_item(
-    *,
-    session: Session = Depends(get_session),
-    id: int,
-    current_user: User = Depends(get_current_active_user),
+        *,
+        session: Session = Depends(get_session),
+        id: int,
+        current_user: User = Depends(get_current_active_user),
 ) -> Any:
     """
     Delete an item.

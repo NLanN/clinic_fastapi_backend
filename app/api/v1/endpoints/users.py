@@ -17,10 +17,10 @@ router = APIRouter()
 
 @router.get("/", response_model=List[UserResponse])
 def read_users(
-    session: Session = Depends(get_session),
-    skip: int = 0,
-    limit: int = 100,
-    current_user: User = Depends(get_current_active_superuser),
+        session: Session = Depends(get_session),
+        skip: int = 0,
+        limit: int = 100,
+        current_user: User = Depends(get_current_active_superuser),
 ) -> Any:
     """
     Retrieve users.
@@ -31,10 +31,10 @@ def read_users(
 
 @router.post("/", response_model=UserResponse)
 def create_user(
-    *,
-    session: Session = Depends(get_session),
-    user_in: UserCreateRequest,
-    current_user: User = Depends(get_current_active_superuser),
+        *,
+        session: Session = Depends(get_session),
+        user_in: UserCreateRequest,
+        current_user: User = Depends(get_current_active_superuser),
 ) -> Any:
     """
     Create new user.
@@ -51,12 +51,12 @@ def create_user(
 
 @router.put("/me", response_model=UserResponse)
 def update_user_me(
-    *,
-    session: Session = Depends(get_session),
-    password: str = Body(None),
-    full_name: str = Body(None),
-    email: EmailStr = Body(None),
-    current_user: User = Depends(get_current_active_user),
+        *,
+        session: Session = Depends(get_session),
+        password: str = Body(None),
+        full_name: str = Body(None),
+        email: EmailStr = Body(None),
+        current_user: User = Depends(get_current_active_user),
 ) -> Any:
     """
     Update own user.
@@ -75,8 +75,8 @@ def update_user_me(
 
 @router.get("/me", response_model=UserResponse)
 def read_user_me(
-    session: Session = Depends(get_session),
-    current_user: User = Depends(get_current_active_user),
+        session: Session = Depends(get_session),
+        current_user: User = Depends(get_current_active_user),
 ) -> Any:
     """
     Get current user.
@@ -86,11 +86,11 @@ def read_user_me(
 
 @router.post("/open", response_model=UserResponse)
 def create_user_open(
-    *,
-    session: Session = Depends(get_session),
-    password: str = Body(...),
-    email: EmailStr = Body(...),
-    full_name: str = Body(None),
+        *,
+        session: Session = Depends(get_session),
+        password: str = Body(...),
+        email: EmailStr = Body(...),
+        full_name: str = Body(None),
 ) -> Any:
     """
     Create new user without the need to be logged in.
@@ -113,9 +113,9 @@ def create_user_open(
 
 @router.get("/{user_id}", response_model=UserResponse)
 def read_user_by_id(
-    user_id: str,
-    current_user: User = Depends(get_current_active_user),
-    session: Session = Depends(get_session),
+        user_id: str,
+        current_user: User = Depends(get_current_active_user),
+        session: Session = Depends(get_session),
 ) -> Any:
     """
     Get a specific user by id.
@@ -130,11 +130,11 @@ def read_user_by_id(
 
 @router.put("/{user_id}", response_model=UserResponse)
 def update_user(
-    *,
-    session: Session = Depends(get_session),
-    user_id: str,
-    user_in: UserUpdateRequest,
-    current_user: User = Depends(get_current_active_superuser),
+        *,
+        session: Session = Depends(get_session),
+        user_id: str,
+        user_in: UserUpdateRequest,
+        current_user: User = Depends(get_current_active_superuser),
 ) -> Any:
     """
     Update a user.

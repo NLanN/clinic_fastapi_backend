@@ -3,3 +3,4 @@
 from db.base_model import BaseModel  # noqa
 from models.item import Item  # noqa
 from models.user import User  # noqa
+from models.patient import Patient # noqa

@@ -9,9 +9,9 @@ user_cli = typer.Typer()
 
 @user_cli.command("create_admin")
 def create_admin_user(
-    email: str = typer.Option("admin@mail.com", help="Default admin@mail.com."),
-    full_name: str = typer.Option("admin", help="Default admin."),
-    password: str = typer.Option("123456@abc", help="Default 123456@abcA"),
+        email: str = typer.Option("admin@mail.com", help="Default admin@mail.com."),
+        full_name: str = typer.Option("admin", help="Default admin."),
+        password: str = typer.Option("123456@abc", help="Default 123456@abcA"),
 ):
     session = next(get_session())
     flt = {

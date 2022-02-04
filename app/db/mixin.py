@@ -1,8 +1,8 @@
-from typing import Any, Dict, Generic, List, Optional, Type, TypeVar, Union
+from typing import Any, Dict, Generic, List, Optional, Type, TypeVar, Union, Tuple
 
 from fastapi.encoders import jsonable_encoder
 from pydantic import BaseModel
-from sqlalchemy import inspect, select
+from sqlalchemy import inspect, select, func
 from sqlalchemy.orm import Session
 
 from db.base_model import BaseModel as Base
@@ -32,7 +32,7 @@ class DBMixin(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
 
     # SQLALCHEMY 2.0 style
     def get_one_by_filter(self, session: Session, flt: dict):
-        return session.execute(select(self.model).filter_by(**flt)).scalar_one()
+        return session.execute(select(self.model).filter_by(**flt)).scalar()
 
     def get_multi(self, session: Session, *, skip: int = 0, limit: int = 100) -> List[ModelType]:
         return session.query(self.model).offset(skip).limit(limit).all()
@@ -50,7 +50,7 @@ class DBMixin(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         return db_obj
 
     def update(
-        self, session: Session, *, db_obj: ModelType, obj_in: Union[UpdateSchemaType, Dict[str, Any]]
+            self, session: Session, *, db_obj: ModelType, obj_in: Union[UpdateSchemaType, Dict[str, Any]]
     ) -> ModelType:
         obj_data = jsonable_encoder(db_obj)
         if isinstance(obj_in, dict):
@@ -65,11 +65,53 @@ class DBMixin(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         session.refresh(db_obj)
         return db_obj
 
+    def find_and_update(
+            self, session: Session, *, id: Any, obj_in: Union[UpdateSchemaType, Dict[str, Any]]
+    ):
+        db_obj = session.query(self.model).filter(self.model.id == id).first()
+        if not db_obj:
+            return None
+        if isinstance(obj_in, dict):
+            update_data = obj_in
+        else:
+            update_data = obj_in.dict(exclude_unset=True)
+
+        db_fields_list = jsonable_encoder(db_obj)
+        for field in db_fields_list:
+            if field in update_data:
+                setattr(db_obj, field, update_data[field])
+        session.add(db_obj)
+        session.commit()
+        session.refresh(db_obj)
+        return db_obj
+
     def remove(self, session: Session, *, id: int) -> ModelType:
         obj = session.query(self.model).get(id)
         session.delete(obj)
         session.commit()
         return obj
+
+    def remove_all(self, session: Session) -> ModelType:
+        obj = session.query(self.model).delete()
+        session.commit()
+        return obj
+
+    def get_all_with_paginate(self, session: Session, *, skip: int = 0, limit: int = 100, flt: dict = None) -> Tuple[
+        int, List[ModelType]]:
+
+        result = session.execute(select(self.model).offset(skip).limit(limit)).scalars().all()
+        count = session.scalar(select(func.count()).select_from(self.model))
+
+        return count, result
+
+    def get_all_with_filter_and_paginate(self, session: Session, *, skip: int = 0, limit: int = 100, flt: dict = None) -> Tuple[
+        int, List[ModelType]]:
+        result = session.execute(select(self.model).filter_by(**flt).offset(skip).limit(limit)).scalars().all()
+        count = session.scalar(select(func.count()).select_from(self.model).filter_by(**flt))
+        return count, result
+
+    def get_all_with_filters(self, session: Session, *, flt: dict, skip: int = 0, limit: int = 100) -> List[ModelType]:
+        return session.execute(select(self.model).filter_by(**flt).offset(skip).limit(limit)).scalars().all()
 
     def to_dict(self, obj, level: int = 1, current_level: int = 0):
         """

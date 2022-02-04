@@ -1,7 +1,8 @@
 from datetime import timedelta
 from typing import Any
 
-from fastapi import APIRouter, Body, Depends, HTTPException
+from fastapi import APIRouter, Body, Depends
+from fastapi import HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 
@@ -21,8 +22,8 @@ router = APIRouter()
 
 @router.post("/access-token", response_model=Token)
 def login_access_token(
-    session: Session = Depends(get_session),
-    form_data: OAuth2PasswordRequestForm = Depends(),
+        session: Session = Depends(get_session),
+        form_data: OAuth2PasswordRequestForm = Depends(),
 ) -> Any:
     """
     OAuth2 compatible token login, get an access token for future requests
@@ -49,9 +50,9 @@ def test_token(current_user: User = Depends(get_current_user)) -> Any:
 
 @router.post("/reset-password/", response_model=Msg)
 def reset_password(
-    token: str = Body(...),
-    new_password: str = Body(...),
-    session: Session = Depends(get_session),
+        token: str = Body(...),
+        new_password: str = Body(...),
+        session: Session = Depends(get_session),
 ) -> Any:
     """
     Reset password

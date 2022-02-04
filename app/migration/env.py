@@ -3,6 +3,7 @@ from __future__ import with_statement
 import os
 from logging.config import fileConfig
 
+import requests
 import dotenv
 from alembic import context
 from sqlalchemy import engine_from_config, pool
@@ -33,12 +34,12 @@ target_metadata = BaseModel.metadata
 
 
 def get_url():
-    user = os.getenv("MYSQL_USER", "mysql+pymysql")
-    password = os.getenv("MYSQL_PASSWORD", "")
-    server = os.getenv("MYSQL_SERVER", "db")
-    port = os.getenv("MYSQL_PORT", 3306)
-    db = os.getenv("MYSQL_DB", "app")
-    return f"mysql+pymysql://{user}:{password}@{server}:{port}/{db}"
+    user = os.getenv("POSTGRES_USER", "mysql+pymysql")
+    password = os.getenv("POSTGRES_PASSWORD", "")
+    server = os.getenv("POSTGRES_SERVER", "db")
+    port = os.getenv("POSTGRES_PORT", 3306)
+    db = os.getenv("POSTGRES_DB", "app")
+    return f"postgresql+psycopg2://{user}:{password}@{server}:{port}/{db}"
 
 
 def run_migrations_offline():

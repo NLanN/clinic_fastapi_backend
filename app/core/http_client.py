@@ -1,52 +1,27 @@
-import aiohttp
-import ujson
+import json
+
+import requests
+from requests.models import Response
 
 
-class HTTPClient(object):
-    @staticmethod
-    def get(url, params=None, headers={}):
-        # resp = None
-        headers["Content-Type"] = "application/json"
-        with aiohttp.ClientSession(headers=headers) as session:
-            with session.get(url, params=params) as response:
-                if (response.status == 200) or (response.status == 201):
-                    resp = response.json()
-                    return resp
-                else:
-                    return {
-                        "error_code": "HTTP_ERROR",
-                        "error_message": response.text(),
-                    }
-        return {"error_code": "UNKNOWN_ERROR", "error_message": ""}
+class HttpClient:
+    def get(self, url, params=None, headers=None):
+        r = requests.get(url=url, params=params, headers=headers)
+        return self._parse_response(r)
 
-    @staticmethod
-    def post(url, data, headers={}):
-        # resp = None
-        headers["Content-Type"] = "application/json"
-        with aiohttp.ClientSession(headers=headers, json_serialize=ujson.dumps) as session:
-            with session.post(url, json=data) as response:
-                if (response.status == 200) or (response.status == 201):
-                    resp = response.json()
-                    return resp
-                else:
-                    return {
-                        "error_code": "HTTP_ERROR",
-                        "error_message": response.text(),
-                    }
-        return {"error_code": "UNKNOWN_ERROR", "error_message": ""}
+    def post(self, url, params=None, body=None, headers=None):
+        if not body or not isinstance(body, dict):
+            raise Exception("Body type must be dict")
+        r: Response = requests.post(url=url, json=body, params=params, headers=headers)
+        if r.status_code not in [200, 201, 204]:
+            return {"code": r.status_code, "error": json.loads(r.content)}
+        return self._parse_response(r)
 
-    @staticmethod
-    def put(url, data, headers={}):
-        # resp = None
-        headers["Content-Type"] = "application/json"
-        with aiohttp.ClientSession(headers=headers, json_serialize=ujson.dumps) as session:
-            with session.put(url, json=data) as response:
-                if (response.status == 200) or (response.status == 201):
-                    resp = response.json()
-                    return resp
-                else:
-                    return {
-                        "error_code": "HTTP_ERROR",
-                        "error_message": response.text(),
-                    }
-        return {"error_code": "UNKNOWN_ERROR", "error_message": ""}
+    def _parse_response(self, r: Response):
+        if r.status_code == 200 or r.status_code == 201:
+            return json.loads(r.content)
+        else:
+            return None
+
+
+client = HttpClient()

@@ -11,7 +11,7 @@ from models.user import User
 from schemas.token import TokenPayload
 from services.user import user_service
 
-reusable_oauth2 = OAuth2PasswordBearer(tokenUrl=f"{settings.API_V1_STR}/access-token")
+reusable_oauth2 = OAuth2PasswordBearer(tokenUrl=f"{settings.API_V1_STR}/auth/access-token")
 
 
 def get_current_user(session: Session = Depends(get_session), token: str = Depends(reusable_oauth2)) -> User:
@@ -30,7 +30,7 @@ def get_current_user(session: Session = Depends(get_session), token: str = Depen
 
 
 def get_current_active_user(
-    current_user: User = Depends(get_current_user),
+        current_user: User = Depends(get_current_user),
 ) -> User:
     if not user_service.is_active(current_user):
         raise HTTPException(status_code=400, detail="Inactive user")
@@ -38,7 +38,7 @@ def get_current_active_user(
 
 
 def get_current_active_superuser(
-    current_user: User = Depends(get_current_user),
+        current_user: User = Depends(get_current_user),
 ) -> User:
     if not user_service.is_superuser(current_user):
         raise HTTPException(status_code=400, detail="The user doesn't have enough privileges")
